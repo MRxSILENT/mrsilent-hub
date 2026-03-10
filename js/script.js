@@ -1,9 +1,9 @@
 /* js/script.js
    YouTube Data API primary + RSS fallback script.
-   - Uses YouTube Data API v3 to fetch latest videos and subscriber count.
-   - Falls back to RSS via AllOrigins proxy if API calls fail.
+   - Uses YouTube Data API v3 to fetch latest videos, subscriber count, and playlists.
+   - Falls back to RSS for videos only if API fails.
    - Designed for static hosting (GitHub Pages).
-   - IMPORTANT: Restrict your API key to your GitHub Pages domain in Google Cloud Console.
+   - NOTE: Restrict your API key to your GitHub Pages domain in Google Cloud Console.
 */
 
 /* ========== CONFIG ========== */
@@ -14,8 +14,10 @@ const CHANNEL_ID = window.CHANNEL_ID || 'UCKQ_q75TKeAcYXYeu0uaWlQ';
 const YT_BASE = 'https://www.googleapis.com/youtube/v3';
 const SEARCH_ENDPOINT = `${YT_BASE}/search`;
 const CHANNELS_ENDPOINT = `${YT_BASE}/channels`;
+const VIDEOS_ENDPOINT = `${YT_BASE}/videos`;
+const PLAYLISTS_ENDPOINT = `${YT_BASE}/playlists`;
 
-/* RSS fallback */
+/* RSS fallback (used only if API fails) */
 const RSS_URL = `https://www.youtube.com/feeds/videos.xml?channel_id=${CHANNEL_ID}`;
 const PROXY = 'https://api.allorigins.win/raw?url=';
 
@@ -59,7 +61,7 @@ async function fetchSubscriberCount(){
   }
 }
 
-/* Fetch latest videos via search.list (returns up to 50) */
+/* Fetch latest videos via search.list (returns up to maxResults) */
 async function fetchLatestVideosFromAPI(maxResults = 50){
   try{
     const url = `${SEARCH_ENDPOINT}?part=snippet&channelId=${CHANNEL_ID}&order=date&type=video&maxResults=${maxResults}&key=${API_KEY}`;
@@ -82,6 +84,42 @@ async function fetchLatestVideosFromAPI(maxResults = 50){
     return videos;
   }catch(e){
     err('fetchLatestVideosFromAPI failed', e);
+    throw e;
+  }
+}
+
+/* Fetch video details (contentDetails) for durations and other metadata */
+async function fetchVideoDetails(ids = []){
+  if(!ids.length) return [];
+  try{
+    const url = `${VIDEOS_ENDPOINT}?part=contentDetails,statistics&id=${ids.join(',')}&key=${API_KEY}`;
+    const res = await fetch(url);
+    if(!res.ok) throw new Error(`YT videos API ${res.status}`);
+    const data = await res.json();
+    const map = {};
+    (data.items || []).forEach(item => {
+      map[item.id] = {
+        duration: item.contentDetails?.duration || '',
+        viewCount: item.statistics?.viewCount || 0
+      };
+    });
+    return map;
+  }catch(e){
+    err('fetchVideoDetails failed', e);
+    return {};
+  }
+}
+
+/* Fetch playlists for the channel */
+async function fetchPlaylistsFromAPI(pageToken = '') {
+  try{
+    const url = `${PLAYLISTS_ENDPOINT}?part=snippet&channelId=${CHANNEL_ID}&maxResults=50&pageToken=${pageToken}&key=${API_KEY}`;
+    const res = await fetch(url);
+    if(!res.ok) throw new Error(`YT playlists API ${res.status}`);
+    const data = await res.json();
+    return data;
+  }catch(e){
+    err('fetchPlaylistsFromAPI failed', e);
     throw e;
   }
 }
@@ -126,13 +164,13 @@ function parseRssXml(xmlText){
 
 /* ========== Rendering and UI logic ========== */
 
+/* Render videos and UI: tries API first, falls back to RSS */
 async function renderVideosAndUI(){
-  // Try API first
   let videos = [];
   try{
     videos = await fetchLatestVideosFromAPI(50);
   }catch(apiErr){
-    log('API videos failed, falling back to RSS');
+    log('API videos failed, falling back to RSS', apiErr);
     try{
       const xml = await fetchRssViaProxy();
       videos = parseRssXml(xml);
@@ -218,7 +256,6 @@ function attachSearchHandlers(videos){
 async function initSubscriberCounter(){
   const el = document.getElementById('subscriber-counter') || document.getElementById('subscriber-counter-2');
   if(!el) return;
-  // Try API
   try{
     const subs = await fetchSubscriberCount();
     if(subs && subs > 0){
@@ -228,7 +265,6 @@ async function initSubscriberCounter(){
   }catch(e){
     log('Subscriber API failed, using fallback placeholder');
   }
-  // Fallback placeholder
   const placeholder = el.getAttribute('data-placeholder') || '12.3K';
   el.textContent = `${placeholder} subscribers`;
 }
@@ -267,6 +303,42 @@ function initWatchPage(){
   playerWrap.appendChild(iframe);
 }
 
+/* ========== Playlists rendering ========== */
+
+/* Render all public playlists on playlists.html */
+async function renderPlaylists(){
+  const container = document.querySelector('.playlist-grid');
+  if(!container) return;
+  container.innerHTML = '';
+
+  // Try API to list playlists (may be paginated)
+  try{
+    let nextPage = '';
+    let total = 0;
+    do {
+      const data = await fetchPlaylistsFromAPI(nextPage);
+      nextPage = data.nextPageToken || '';
+      (data.items || []).forEach(pl => {
+        const id = pl.id;
+        const title = pl.snippet?.title || 'Playlist';
+        const card = document.createElement('div');
+        card.className = 'playlist-card';
+        // embed playlist player
+        card.innerHTML = `<iframe src="https://www.youtube.com/embed?listType=playlist&list=${id}" frameborder="0" allowfullscreen></iframe>
+                          <div class="playlist-title">${escapeHtml(title)}</div>`;
+        container.appendChild(card);
+        total++;
+      });
+    } while(nextPage);
+    if(total === 0){
+      container.innerHTML = `<div class="about-card">No public playlists found for this channel.</div>`;
+    }
+  }catch(e){
+    err('renderPlaylists failed, showing fallback message', e);
+    container.innerHTML = `<div class="about-card">Unable to load playlists. Check console for details.</div>`;
+  }
+}
+
 /* ========== Initialization ========== */
 document.addEventListener('DOMContentLoaded', async ()=>{
   try{
@@ -284,11 +356,18 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   }catch(e){
     err('initWatchPage error', e);
   }
+  try{
+    await renderPlaylists();
+  }catch(e){
+    err('renderPlaylists error', e);
+  }
 });
 
 /* Expose for shorts.js */
 window._mrSilent = {
   fetchRssViaProxy,
   parseRssXml,
-  RSS_URL
+  RSS_URL,
+  fetchLatestVideosFromAPI,
+  fetchVideoDetails
 };
