@@ -1,46 +1,32 @@
-/* script.js
-   Core site logic: fetch RSS feed, render video cards, search, watch page loader, subscriber counter.
-   Optional: set API_KEY to a valid YouTube Data API v3 key to enable real subscriber count.
+/* js/script.js
+   YouTube Data API primary + RSS fallback script.
+   - Uses YouTube Data API v3 to fetch latest videos and subscriber count.
+   - Falls back to RSS via AllOrigins proxy if API calls fail.
+   - Designed for static hosting (GitHub Pages).
+   - IMPORTANT: Restrict your API key to your GitHub Pages domain in Google Cloud Console.
 */
 
-/* CONFIG */
-const API_KEY = ''; // <-- OPTIONAL: Add your YouTube Data API v3 key here to enable real subscriber count
+/* ========== CONFIG ========== */
+const API_KEY = 'AIzaSyAEBSwFQQHGdg7EdKTWXaBvl6b6cOhFpXc'; // <-- your provided key
 const CHANNEL_ID = window.CHANNEL_ID || 'UCKQ_q75TKeAcYXYeu0uaWlQ';
+
+/* YouTube Data API endpoints */
+const YT_BASE = 'https://www.googleapis.com/youtube/v3';
+const SEARCH_ENDPOINT = `${YT_BASE}/search`;
+const CHANNELS_ENDPOINT = `${YT_BASE}/channels`;
+
+/* RSS fallback */
 const RSS_URL = `https://www.youtube.com/feeds/videos.xml?channel_id=${CHANNEL_ID}`;
-const CORS_FALLBACK = url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+const PROXY = 'https://api.allorigins.win/raw?url=';
 
-/* Utility: fetch with CORS fallback */
-async function fetchWithFallback(url){
-  try{
-    const res = await fetch(url, {mode:'cors'});
-    if(!res.ok) throw new Error('CORS or network error');
-    return await res.text();
-  }catch(e){
-    // fallback to public CORS proxy
-    const fallback = CORS_FALLBACK(url);
-    const res2 = await fetch(fallback);
-    if(!res2.ok) throw new Error('Fallback failed');
-    return await res2.text();
-  }
-}
+/* Utility helpers */
+function log(...args){ console.log('[mr-silent]', ...args); }
+function err(...args){ console.error('[mr-silent]', ...args); }
+function escapeHtml(s){ return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function formatDate(iso){ if(!iso) return ''; const d = new Date(iso); return d.toLocaleDateString(); }
+function formatCompact(n){ if(n>=1_000_000) return (n/1_000_000).toFixed(1).replace(/\.0$/,'')+'M'; if(n>=1000) return (n/1000).toFixed(1).replace(/\.0$/,'')+'K'; return String(n); }
 
-/* Parse RSS XML and return array of videos */
-function parseRSS(xmlText){
-  const parser = new DOMParser();
-  const xml = parser.parseFromString(xmlText, 'application/xml');
-  const entries = Array.from(xml.querySelectorAll('entry'));
-  return entries.map(e => {
-    const id = e.querySelector('yt\\:videoId')?.textContent || e.querySelector('id')?.textContent?.split(':').pop();
-    const title = e.querySelector('title')?.textContent || '';
-    const published = e.querySelector('published')?.textContent || '';
-    const link = e.querySelector('link')?.getAttribute('href') || `https://www.youtube.com/watch?v=${id}`;
-    const thumbnail = `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
-    const description = e.querySelector('media\\:description')?.textContent || '';
-    return {id,title,published,link,thumbnail,description};
-  });
-}
-
-/* Render video card */
+/* Create video card */
 function createVideoCard(video){
   const a = document.createElement('a');
   a.className = 'video-card';
@@ -55,86 +41,159 @@ function createVideoCard(video){
   return a;
 }
 
-/* Helpers */
-function formatDate(iso){
-  if(!iso) return '';
-  const d = new Date(iso);
-  return d.toLocaleDateString();
-}
-function escapeHtml(s){ return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+/* ========== YouTube Data API functions ========== */
 
-/* Load and render latest videos (for index) */
-async function loadLatestVideos(limit=8){
+/* Fetch subscriber count via channels.list */
+async function fetchSubscriberCount(){
   try{
-    const xml = await fetchWithFallback(RSS_URL);
-    const videos = parseRSS(xml);
-    const grid = document.getElementById('videos-grid') || document.getElementById('videos-grid-all');
-    if(!grid) return videos;
-    grid.innerHTML = '';
-    videos.slice(0,limit).forEach(v => grid.appendChild(createVideoCard(v)));
-    // trending: pick top 3 by recency
-    const trendingRow = document.getElementById('trending-row');
-    if(trendingRow){
-      trendingRow.innerHTML = '';
-      videos.slice(0,3).forEach(v=>{
-        const card = document.createElement('div');
-        card.className = 'trending-card';
-        card.innerHTML = `<a href="watch.html?id=${v.id}" style="text-decoration:none;color:inherit">
-          <img src="${v.thumbnail}" style="width:100%;height:160px;object-fit:cover;border-radius:8px" />
-          <h4 style="margin:10px 0 6px;color:var(--accent)">${escapeHtml(v.title)}</h4>
-          <div style="color:var(--muted);font-size:13px">${formatDate(v.published)}</div>
-        </a>`;
-        trendingRow.appendChild(card);
-      });
-    }
+    const url = `${CHANNELS_ENDPOINT}?part=statistics&id=${CHANNEL_ID}&key=${API_KEY}`;
+    const res = await fetch(url);
+    if(!res.ok) throw new Error(`YT channels API ${res.status}`);
+    const data = await res.json();
+    const subs = Number(data.items?.[0]?.statistics?.subscriberCount || 0);
+    log('Subscriber count from API', subs);
+    return subs;
+  }catch(e){
+    err('fetchSubscriberCount failed', e);
+    throw e;
+  }
+}
 
-    // For videos.html full list
-    const allGrid = document.getElementById('videos-grid-all');
-    if(allGrid){
-      allGrid.innerHTML = '';
-      videos.forEach(v => allGrid.appendChild(createVideoCard(v)));
-      // Load more button hides (we already show all)
-      const loadMore = document.getElementById('load-more-wrap');
-      if(loadMore) loadMore.style.display = 'none';
-    }
-
-    // Up next for watch page
-    const upnext = document.getElementById('upnext');
-    if(upnext){
-      upnext.innerHTML = '';
-      videos.slice(0,8).forEach(v=>{
-        const el = document.createElement('a');
-        el.href = `watch.html?id=${v.id}`;
-        el.className = 'video-card';
-        el.style.display = 'flex';
-        el.style.gap = '8px';
-        el.style.alignItems = 'center';
-        el.innerHTML = `<img src="${v.thumbnail}" style="width:120px;height:68px;object-fit:cover;border-radius:8px" />
-          <div style="flex:1">
-            <div style="font-size:13px;color:#eaf6fb">${escapeHtml(v.title)}</div>
-            <div style="font-size:12px;color:var(--muted)">${formatDate(v.published)}</div>
-          </div>`;
-        upnext.appendChild(el);
-      });
-    }
-
-    // About page: channel description (if present in feed)
-    const descEl = document.getElementById('channel-description');
-    if(descEl){
-      // RSS feed doesn't include channel description reliably; show placeholder
-      descEl.textContent = 'Welcome to Mr. Si!ent — gaming content focused on Minecraft, Roblox, and ARK Survival. Subscribe for gameplay, tutorials, and live streams.';
-    }
-
-    // For search inputs
-    attachSearchHandlers(videos);
-
+/* Fetch latest videos via search.list (returns up to 50) */
+async function fetchLatestVideosFromAPI(maxResults = 50){
+  try{
+    const url = `${SEARCH_ENDPOINT}?part=snippet&channelId=${CHANNEL_ID}&order=date&type=video&maxResults=${maxResults}&key=${API_KEY}`;
+    const res = await fetch(url);
+    if(!res.ok) throw new Error(`YT search API ${res.status}`);
+    const data = await res.json();
+    const videos = (data.items || []).map(item => {
+      const id = item.id?.videoId;
+      const snip = item.snippet || {};
+      const thumbnail = snip.thumbnails?.high?.url || snip.thumbnails?.default?.url || `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
+      return {
+        id,
+        title: snip.title || '',
+        published: snip.publishedAt || '',
+        thumbnail,
+        description: snip.description || ''
+      };
+    }).filter(v => v.id);
+    log('Videos from API', videos.length);
     return videos;
-  }catch(err){
-    console.error('Failed to load videos', err);
-    const grid = document.getElementById('videos-grid') || document.getElementById('videos-grid-all');
-    if(grid) grid.innerHTML = `<div class="about-card">Unable to load videos. Try again later.</div>`;
+  }catch(e){
+    err('fetchLatestVideosFromAPI failed', e);
+    throw e;
+  }
+}
+
+/* ========== RSS fallback functions ========== */
+
+async function fetchRssViaProxy(){
+  try{
+    const proxied = PROXY + encodeURIComponent(RSS_URL);
+    const res = await fetch(proxied);
+    if(!res.ok) throw new Error(`Proxy RSS ${res.status}`);
+    const text = await res.text();
+    return text;
+  }catch(e){
+    err('fetchRssViaProxy failed', e);
+    throw e;
+  }
+}
+
+function parseRssXml(xmlText){
+  try{
+    const parser = new DOMParser();
+    const xml = parser.parseFromString(xmlText, 'application/xml');
+    const entries = Array.from(xml.getElementsByTagName('entry') || []);
+    const videos = entries.map(e => {
+      const vidNode = e.getElementsByTagName('yt:videoId')[0] || e.getElementsByTagName('videoId')[0];
+      const id = vidNode ? vidNode.textContent.trim() : (e.getElementsByTagName('id')[0]?.textContent?.split(':').pop() || '');
+      const title = e.getElementsByTagName('title')[0]?.textContent || '';
+      const published = e.getElementsByTagName('published')[0]?.textContent || '';
+      const mediaThumb = e.getElementsByTagName('media:thumbnail')[0];
+      const thumbnail = mediaThumb?.getAttribute('url') || `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
+      const description = e.getElementsByTagName('media:description')[0]?.textContent || '';
+      return { id, title, published, thumbnail, description };
+    }).filter(v => v.id);
+    log('Videos from RSS', videos.length);
+    return videos;
+  }catch(e){
+    err('parseRssXml failed', e);
     return [];
   }
+}
+
+/* ========== Rendering and UI logic ========== */
+
+async function renderVideosAndUI(){
+  // Try API first
+  let videos = [];
+  try{
+    videos = await fetchLatestVideosFromAPI(50);
+  }catch(apiErr){
+    log('API videos failed, falling back to RSS');
+    try{
+      const xml = await fetchRssViaProxy();
+      videos = parseRssXml(xml);
+    }catch(rssErr){
+      err('Both API and RSS failed to load videos', rssErr);
+      videos = [];
+    }
+  }
+
+  // Render into grids
+  const grid = document.getElementById('videos-grid') || document.getElementById('videos-grid-all');
+  if(grid){
+    grid.innerHTML = '';
+    const list = (grid.id === 'videos-grid') ? videos.slice(0, 12) : videos;
+    if(list.length === 0){
+      grid.innerHTML = `<div class="about-card">No videos available right now. Check console for details.</div>`;
+    }else{
+      list.forEach(v => grid.appendChild(createVideoCard(v)));
+    }
+  }
+
+  // Trending
+  const trendingRow = document.getElementById('trending-row');
+  if(trendingRow){
+    trendingRow.innerHTML = '';
+    videos.slice(0,3).forEach(v=>{
+      const card = document.createElement('div');
+      card.className = 'trending-card';
+      card.innerHTML = `<a href="watch.html?id=${v.id}" style="text-decoration:none;color:inherit">
+        <img src="${v.thumbnail}" style="width:100%;height:160px;object-fit:cover;border-radius:8px" />
+        <h4 style="margin:10px 0 6px;color:var(--accent)">${escapeHtml(v.title)}</h4>
+        <div style="color:var(--muted);font-size:13px">${formatDate(v.published)}</div>
+      </a>`;
+      trendingRow.appendChild(card);
+    });
+  }
+
+  // Up next
+  const upnext = document.getElementById('upnext');
+  if(upnext){
+    upnext.innerHTML = '';
+    videos.slice(0,8).forEach(v=>{
+      const el = document.createElement('a');
+      el.href = `watch.html?id=${v.id}`;
+      el.className = 'video-card';
+      el.style.display = 'flex';
+      el.style.gap = '8px';
+      el.style.alignItems = 'center';
+      el.innerHTML = `<img src="${v.thumbnail}" style="width:120px;height:68px;object-fit:cover;border-radius:8px" />
+        <div style="flex:1">
+          <div style="font-size:13px;color:#eaf6fb">${escapeHtml(v.title)}</div>
+          <div style="font-size:12px;color:var(--muted)">${formatDate(v.published)}</div>
+        </div>`;
+      upnext.appendChild(el);
+    });
+  }
+
+  // Attach search handlers
+  attachSearchHandlers(videos);
+
+  return videos;
 }
 
 /* Search filtering */
@@ -146,7 +205,7 @@ function attachSearchHandlers(videos){
     const grid = document.getElementById('videos-grid') || document.getElementById('videos-grid-all');
     if(!grid) return;
     grid.innerHTML = '';
-    const filtered = videos.filter(v => v.title.toLowerCase().includes(q) || v.description.toLowerCase().includes(q));
+    const filtered = videos.filter(v => (v.title + ' ' + v.description).toLowerCase().includes(q));
     if(filtered.length === 0){
       grid.innerHTML = `<div class="about-card">No videos found for "${escapeHtml(q)}".</div>`;
     }else{
@@ -155,30 +214,26 @@ function attachSearchHandlers(videos){
   });
 }
 
-/* Subscriber counter (animated). Uses YouTube Data API if API_KEY is set. */
+/* Subscriber counter init */
 async function initSubscriberCounter(){
   const el = document.getElementById('subscriber-counter') || document.getElementById('subscriber-counter-2');
   if(!el) return;
-  if(API_KEY && API_KEY.trim().length>0){
-    try{
-      const url = `https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${CHANNEL_ID}&key=${API_KEY}`;
-      const res = await fetch(url);
-      const data = await res.json();
-      const subs = data.items?.[0]?.statistics?.subscriberCount || null;
-      if(subs){
-        animateNumber(el, Number(subs));
-        return;
-      }
-    }catch(e){
-      console.warn('YouTube API failed', e);
+  // Try API
+  try{
+    const subs = await fetchSubscriberCount();
+    if(subs && subs > 0){
+      animateNumber(el, subs);
+      return;
     }
+  }catch(e){
+    log('Subscriber API failed, using fallback placeholder');
   }
-  // Fallback: animated placeholder value from data-placeholder attribute or default
+  // Fallback placeholder
   const placeholder = el.getAttribute('data-placeholder') || '12.3K';
   el.textContent = `${placeholder} subscribers`;
 }
 
-/* Animate number to target */
+/* Animate number */
 function animateNumber(el, target){
   const start = 0;
   const duration = 1200;
@@ -192,14 +247,9 @@ function animateNumber(el, target){
   }
   requestAnimationFrame(tick);
 }
-function formatCompact(n){
-  if(n >= 1_000_000) return (n/1_000_000).toFixed(1).replace(/\.0$/,'') + 'M';
-  if(n >= 1_000) return (n/1_000).toFixed(1).replace(/\.0$/,'') + 'K';
-  return String(n);
-}
 
-/* Watch page loader: reads ?id=VIDEO_ID and injects iframe */
-function initWatchPage(videos){
+/* Watch page loader */
+function initWatchPage(){
   const params = new URLSearchParams(location.search);
   const id = params.get('id');
   const playerWrap = document.getElementById('player-wrap');
@@ -215,30 +265,30 @@ function initWatchPage(videos){
   iframe.allowFullscreen = true;
   playerWrap.innerHTML = '';
   playerWrap.appendChild(iframe);
-
-  // Highlight upnext item if present
-  const upnext = document.getElementById('upnext');
-  if(upnext){
-    Array.from(upnext.querySelectorAll('a')).forEach(a=>{
-      if(a.href.includes(`id=${id}`) || a.href.includes(`watch?v=${id}`)) a.style.opacity = '0.6';
-    });
-  }
 }
 
-/* Initialize site */
+/* ========== Initialization ========== */
 document.addEventListener('DOMContentLoaded', async ()=>{
-  // Load videos and render
-  const videos = await loadLatestVideos(12);
-  // Initialize subscriber counter
-  initSubscriberCounter();
-  // If on watch page, init player
-  initWatchPage(videos);
+  try{
+    await renderVideosAndUI();
+  }catch(e){
+    err('renderVideosAndUI error', e);
+  }
+  try{
+    await initSubscriberCounter();
+  }catch(e){
+    err('initSubscriberCounter error', e);
+  }
+  try{
+    initWatchPage();
+  }catch(e){
+    err('initWatchPage error', e);
+  }
 });
 
-/* Expose for shorts.js to reuse RSS parsing */
+/* Expose for shorts.js */
 window._mrSilent = {
-  fetchWithFallback,
-  parseRSS,
-  RSS_URL,
-  CORS_FALLBACK
+  fetchRssViaProxy,
+  parseRssXml,
+  RSS_URL
 };
