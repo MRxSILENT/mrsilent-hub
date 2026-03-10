@@ -117,9 +117,13 @@ body.app{
   transition:transform .18s ease, box-shadow .18s ease;
   cursor:pointer;
   border:1px solid rgba(255,255,255,0.03);
+  will-change: transform, opacity;
 }
 .video-card:hover{transform:translateY(-6px);box-shadow:0 12px 40px rgba(0,179,255,0.06)}
+.thumb-wrap{position:relative;overflow:hidden;height:150px;background:#000}
 .thumb{width:100%;height:150px;object-fit:cover;display:block;background:#000}
+.thumb.low{filter: blur(6px); transform: scale(1.02); transition: opacity .35s ease, filter .35s ease;}
+.thumb.high{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;top:0;left:0;opacity:0;transition:opacity .35s ease}
 .video-info{padding:12px}
 .video-title{font-size:14px;margin:0 0 8px;color:#eaf6fb}
 .video-meta{font-size:12px;color:var(--muted)}
@@ -161,6 +165,7 @@ body.app{
 /* Playlists */
 .playlist-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
 .playlist-card iframe{width:100%;height:200px;border-radius:12px;border:0}
+.playlist-title{margin-top:8px;color:var(--muted);font-weight:700}
 
 /* About */
 .about-card{background:var(--panel);padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.02)}
@@ -174,6 +179,20 @@ body.app{
   padding:10px 14px;border-radius:10px;border:0;cursor:pointer;font-weight:700;
   box-shadow:0 6px 18px rgba(0,179,255,0.08);
 }
+
+/* Performance & smoothness tweaks */
+.video-card, .trending-card, .playlist-card { will-change: transform, opacity; transform: translateZ(0); }
+.thumb { backface-visibility: hidden; -webkit-transform: translateZ(0); }
+.thumb-wrap { position:relative; overflow:hidden; }
+.thumb.low { filter: blur(6px); transform: scale(1.02); transition: opacity .35s ease, filter .35s ease; }
+.thumb.high { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; top:0; left:0; opacity:0; transition: opacity .35s ease; }
+.short-iframe, .short-item iframe { will-change: transform; border-radius:18px; }
+
+/* smoother scroll */
+html, body, .shorts-viewer { scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
+
+/* reduce repaints for hover */
+.nav-item:hover, .nav-item.active { transform: translateZ(0); }
 
 /* Responsive */
 @media (max-width:900px){
