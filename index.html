@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Mr. Si!ent — Creator Hub</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <script defer src="js/script.js"></script>
+</head>
+<body class="app">
+  <div class="bg-grid"></div>
+
+  <!-- Sidebar (persistent) -->
+  <aside class="sidebar">
+    <div class="brand">
+      <img src="assets/logo.png" alt="Mr. Si!ent logo" class="logo" />
+      <div class="channel-name">Mr. Si!ent</div>
+    </div>
+    <nav class="nav">
+      <a href="index.html" class="nav-item active">Home</a>
+      <a href="videos.html" class="nav-item">Videos</a>
+      <a href="live.html" class="nav-item">Live</a>
+      <a href="shorts.html" class="nav-item">Shorts</a>
+      <a href="playlists.html" class="nav-item">Playlists</a>
+      <a href="about.html" class="nav-item">About</a>
+    </nav>
+    <div class="sidebar-footer">
+      <small>© Mr. Si!ent</small>
+    </div>
+  </aside>
+
+  <!-- Main content -->
+  <main class="main">
+    <header class="topbar">
+      <div class="channel-header">
+        <img src="assets/logo.png" alt="logo" class="logo-sm" />
+        <div>
+          <h1 class="title">Mr. Si!ent</h1>
+          <div class="subscribers" id="subscriber-counter" data-placeholder="12.3K">12.3K subscribers</div>
+        </div>
+      </div>
+
+      <div class="search-wrap">
+        <input id="search-input" class="search" placeholder="Search videos..." />
+      </div>
+    </header>
+
+    <section class="content">
+      <h2 class="section-title">Latest Videos</h2>
+      <div id="videos-grid" class="videos-grid"></div>
+
+      <h2 class="section-title">Trending</h2>
+      <div id="trending-row" class="trending-row"></div>
+    </section>
+  </main>
+
+  <script>
+    // Channel config used by script.js
+    window.CHANNEL_ID = 'UCKQ_q75TKeAcYXYeu0uaWlQ';
+    // Optional: set API_KEY in js/script.js to enable real subscriber count
+  </script>
+</body>
+</html>
