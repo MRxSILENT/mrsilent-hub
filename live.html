@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Live — Mr. Si!ent</title>
   <link rel="stylesheet" href="css/style.css" />
-  <script defer src="js/script.js"></script>
+  <link rel="preconnect" href="https://www.googleapis.com">
+  <link rel="preconnect" href="https://i.ytimg.com">
 </head>
 <body class="app">
   <div class="bg-grid"></div>
@@ -42,5 +43,16 @@
       </div>
     </section>
   </main>
+
+  <script>
+    window.CHANNEL_ID = 'UCKQ_q75TKeAcYXYeu0uaWlQ';
+  </script>
+  <script defer src="js/script.js"></script>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(e => console.warn('SW register failed', e));
+    }
+  </script>
 </body>
 </html>
