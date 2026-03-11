@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-Frame-Options" content="SAMEORIGIN" />
+  <meta name="robots" content="noindex,nofollow,noarchive" />
+  <title>Live — Mr. Si!ent Creator Hub</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" href="assets/logo.png" type="image/png" />
+</head>
+<body>
+
+  <!-- ── Sidebar ───────────────────────────────────────── -->
+  <nav id="sidebar" aria-label="Main navigation">
+    <div class="sidebar-header">
+      <img src="assets/logo.png" alt="Mr. Si!ent logo" class="sidebar-logo" />
+      <span class="sidebar-title">Mr. Si!ent</span>
+    </div>
+    <div class="sidebar-nav">
+      <a href="index.html"     class="nav-link"><span class="nav-icon">🏠</span><span class="nav-label">Home</span></a>
+      <a href="videos.html"    class="nav-link"><span class="nav-icon">▶️</span><span class="nav-label">Videos</span></a>
+      <a href="live.html"      class="nav-link active" aria-current="page"><span class="nav-icon">📡</span><span class="nav-label">Live</span></a>
+      <a href="shorts.html"    class="nav-link"><span class="nav-icon">⚡</span><span class="nav-label">Shorts</span></a>
+      <a href="playlists.html" class="nav-link"><span class="nav-icon">📂</span><span class="nav-label">Playlists</span></a>
+      <a href="about.html"     class="nav-link"><span class="nav-icon">👤</span><span class="nav-label">About</span></a>
+    </div>
+  </nav>
+
+  <!-- ── Mobile Topbar ─────────────────────────────────── -->
+  <div id="topbar" role="banner">
+    <button id="hamburger" aria-label="Open navigation" aria-expanded="false" aria-controls="nav-overlay">&#9776;</button>
+    <span class="topbar-title">LIVE</span>
+    <span style="width:40px"></span>
+  </div>
+
+  <!-- ── Mobile Overlay ────────────────────────────────── -->
+  <div id="nav-overlay" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Navigation menu">
+    <div id="sidebar-mobile">
+      <div class="sidebar-header" style="justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <img src="assets/logo.png" alt="Mr. Si!ent logo" class="sidebar-logo" />
+          <span class="sidebar-title">Mr. Si!ent</span>
+        </div>
+        <button id="nav-close" aria-label="Close navigation"
+          style="background:none;border:none;color:var(--cyan);font-size:1.4rem;cursor:pointer;padding:4px 8px;">&#x2715;</button>
+      </div>
+      <div class="sidebar-nav">
+        <a href="index.html"     class="nav-link"><span class="nav-icon">🏠</span><span class="nav-label">Home</span></a>
+        <a href="videos.html"    class="nav-link"><span class="nav-icon">▶️</span><span class="nav-label">Videos</span></a>
+        <a href="live.html"      class="nav-link active"><span class="nav-icon">📡</span><span class="nav-label">Live</span></a>
+        <a href="shorts.html"    class="nav-link"><span class="nav-icon">⚡</span><span class="nav-label">Shorts</span></a>
+        <a href="playlists.html" class="nav-link"><span class="nav-icon">📂</span><span class="nav-label">Playlists</span></a>
+        <a href="about.html"     class="nav-link"><span class="nav-icon">👤</span><span class="nav-label">About</span></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- MAIN                                                -->
+  <!-- ═══════════════════════════════════════════════════ -->
+  <main id="main-content">
+
+    <!-- ── Current Live Section ──────────────────────── -->
+    <div class="live-page">
+
+      <div class="page-header" style="padding:40px 36px 24px;">
+        <h1 class="page-title">📡 Live</h1>
+        <!-- live status (Online/Offline badge) injected here -->
+        <div id="live-status">
+          <div class="spinner-wrap" style="padding:12px 0;justify-content:flex-start;">
+            <div class="spinner" style="width:24px;height:24px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Player or offline card injected here -->
+      <div id="live-player-wrap" style="padding:0 36px 36px;">
+        <!-- filled by JS -->
+      </div>
+
+      <!-- ── Divider ──────────────────────────────────── -->
+      <div class="section-label" style="padding-top:8px;">
+        &#128247; Past Live Streams
+        <span id="past-lives-count" style="font-family:var(--font-mono);font-size:.7rem;color:var(--text-muted);letter-spacing:.04em;"></span>
+      </div>
+
+      <!-- Past lives grid -->
+      <section id="past-lives-grid" class="videos-grid" aria-label="Past live streams">
+        <div class="spinner-wrap"><div class="spinner"></div></div>
+      </section>
+
+      <!-- Load more for past lives -->
+      <div class="load-more-wrap">
+        <button id="past-lives-load-more" class="btn-load-more" style="display:none;">Load More</button>
+      </div>
+
+    </div>
+  </main>
+
+  <script>window.CHANNEL_ID = 'UCKQ_q75TKeAcYXYeu0uaWlQ';</script>
+  <script src="js/protect.js"></script>
+  <script src="js/script.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js'); });
+    }
+  </script>
+</body>
+</html>
