@@ -5,43 +5,36 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="X-Frame-Options" content="SAMEORIGIN" />
   <meta name="robots" content="noindex,nofollow,noarchive" />
-  <title>Shorts — Mr. Si!ent</title>
+  <title>Shorts — Mr. Si!ent Creator Hub</title>
   <link rel="stylesheet" href="css/style.css" />
   <link rel="icon" href="assets/logo.png" type="image/png" />
-  <style>
-    body { overflow: hidden; }
-    #main-content { display:flex; flex-direction:column; height:100vh; overflow:hidden; }
-    @media (max-width:600px) {
-      body { overflow: auto; }
-      #main-content { height:auto; overflow:visible; }
-      .shorts-list { width:100%;border-right:none;border-bottom:1px solid var(--border);flex-direction:row;overflow-x:auto;overflow-y:hidden;max-height:160px;padding:10px 12px;gap:10px; }
-      .short-item { width:90px;flex-shrink:0;max-height:none;aspect-ratio:9/16;height:140px; }
-      .shorts-viewer { min-height:60vh;flex:1; }
-    }
-  </style>
 </head>
 <body>
+
+  <!-- ── Sidebar ───────────────────────────────────────── -->
   <nav id="sidebar" aria-label="Main navigation">
     <div class="sidebar-header">
       <img src="assets/logo.png" alt="Mr. Si!ent logo" class="sidebar-logo" />
       <span class="sidebar-title">Mr. Si!ent</span>
     </div>
     <div class="sidebar-nav">
-      <a href="index.html" class="nav-link"><span class="nav-icon">🏠</span><span class="nav-label">Home</span></a>
-      <a href="videos.html" class="nav-link"><span class="nav-icon">▶️</span><span class="nav-label">Videos</span></a>
-      <a href="live.html" class="nav-link"><span class="nav-icon">📡</span><span class="nav-label">Live</span></a>
-      <a href="shorts.html" class="nav-link active" aria-current="page"><span class="nav-icon">⚡</span><span class="nav-label">Shorts</span></a>
+      <a href="index.html"     class="nav-link"><span class="nav-icon">🏠</span><span class="nav-label">Home</span></a>
+      <a href="videos.html"    class="nav-link"><span class="nav-icon">▶️</span><span class="nav-label">Videos</span></a>
+      <a href="live.html"      class="nav-link"><span class="nav-icon">📡</span><span class="nav-label">Live</span></a>
+      <a href="shorts.html"    class="nav-link active" aria-current="page"><span class="nav-icon">⚡</span><span class="nav-label">Shorts</span></a>
       <a href="playlists.html" class="nav-link"><span class="nav-icon">📂</span><span class="nav-label">Playlists</span></a>
-      <a href="about.html" class="nav-link"><span class="nav-icon">👤</span><span class="nav-label">About</span></a>
+      <a href="about.html"     class="nav-link"><span class="nav-icon">👤</span><span class="nav-label">About</span></a>
     </div>
   </nav>
 
+  <!-- ── Mobile Topbar ─────────────────────────────────── -->
   <div id="topbar" role="banner">
     <button id="hamburger" aria-label="Open navigation" aria-expanded="false" aria-controls="nav-overlay">&#9776;</button>
     <span class="topbar-title">SHORTS</span>
     <span style="width:40px"></span>
   </div>
 
+  <!-- ── Mobile Overlay ────────────────────────────────── -->
   <div id="nav-overlay" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Navigation menu">
     <div id="sidebar-mobile">
       <div class="sidebar-header" style="justify-content:space-between;">
@@ -52,43 +45,107 @@
         <button id="nav-close" aria-label="Close navigation" style="background:none;border:none;color:var(--cyan);font-size:1.4rem;cursor:pointer;padding:4px 8px;">&#x2715;</button>
       </div>
       <div class="sidebar-nav">
-      <a href="index.html" class="nav-link"><span class="nav-icon">🏠</span><span class="nav-label">Home</span></a>
-      <a href="videos.html" class="nav-link"><span class="nav-icon">▶️</span><span class="nav-label">Videos</span></a>
-      <a href="live.html" class="nav-link"><span class="nav-icon">📡</span><span class="nav-label">Live</span></a>
-      <a href="shorts.html" class="nav-link active" aria-current="page"><span class="nav-icon">⚡</span><span class="nav-label">Shorts</span></a>
-      <a href="playlists.html" class="nav-link"><span class="nav-icon">📂</span><span class="nav-label">Playlists</span></a>
-      <a href="about.html" class="nav-link"><span class="nav-icon">👤</span><span class="nav-label">About</span></a>
+        <a href="index.html"     class="nav-link"><span class="nav-icon">🏠</span><span class="nav-label">Home</span></a>
+        <a href="videos.html"    class="nav-link"><span class="nav-icon">▶️</span><span class="nav-label">Videos</span></a>
+        <a href="live.html"      class="nav-link"><span class="nav-icon">📡</span><span class="nav-label">Live</span></a>
+        <a href="shorts.html"    class="nav-link active"><span class="nav-icon">⚡</span><span class="nav-label">Shorts</span></a>
+        <a href="playlists.html" class="nav-link"><span class="nav-icon">📂</span><span class="nav-label">Playlists</span></a>
+        <a href="about.html"     class="nav-link"><span class="nav-icon">👤</span><span class="nav-label">About</span></a>
       </div>
     </div>
   </div>
 
-
+  <!-- ── Main Content ──────────────────────────────────── -->
   <main id="main-content">
-    <div class="shorts-header" style="padding:18px 24px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;flex-shrink:0;">
-      <h1 class="page-title" style="font-size:1rem;">&#9889; Shorts</h1>
-      <span style="color:var(--text-muted);font-size:.85rem;font-family:var(--font-mono);">&#8593; &#8595; Arrow keys to navigate</span>
-      <span id="shorts-count" style="margin-left:auto;font-family:var(--font-mono);font-size:.8rem;color:var(--text-muted);"></span>
+
+    <div class="page-header">
+      <h1 class="page-title">⚡ Shorts</h1>
+      <p class="page-subtitle">
+        All Shorts from Mr. Si!ent · Click any card to watch · 
+        <span id="shorts-count" style="color:var(--cyan);font-family:var(--font-mono);"></span>
+      </p>
     </div>
-    <div style="display:flex;flex:1;overflow:hidden;">
-      <div id="shorts-list" class="shorts-list" aria-label="Shorts list"></div>
-      <div id="shorts-viewer" class="shorts-viewer">
-        <div id="shorts-loading" class="spinner-wrap" style="position:absolute;"><div class="spinner"></div></div>
-        <div id="shorts-empty" class="shorts-empty" style="display:none;" aria-live="polite">
-          <div class="empty-icon">&#9889;</div>No Shorts found on this channel yet.
-        </div>
-        <div id="shorts-player" class="shorts-player" aria-label="Shorts player"></div>
-      </div>
+
+    <!-- Loading -->
+    <div id="shorts-loading" class="spinner-wrap" style="display:none;">
+      <div class="spinner"></div>
     </div>
+
+    <!-- Empty state -->
+    <div id="shorts-empty" class="empty-state" style="display:none;">
+      <div class="empty-icon">⚡</div>
+      No Shorts found on this channel yet.
+    </div>
+
+    <!-- Shorts grid (same layout as videos) -->
+    <section id="shorts-grid" class="videos-grid" aria-label="Shorts videos">
+    </section>
+
   </main>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- Short Player Modal                                     -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div id="short-modal" class="short-modal" role="dialog" aria-modal="true" aria-label="Short player" aria-hidden="true">
+    <button id="short-modal-close" class="short-modal-close" aria-label="Close">&#x2715;</button>
+
+    <div class="short-modal-inner">
+
+      <!-- 9:16 player -->
+      <div id="short-modal-player" class="short-modal-player"></div>
+
+      <!-- Info panel -->
+      <div class="short-modal-info">
+        <h2 id="short-modal-title" class="short-modal-title"></h2>
+
+        <!-- Stats row -->
+        <div id="short-modal-stats" class="short-modal-stats watch-stats"></div>
+
+        <!-- Like button -->
+        <button id="short-modal-like" class="modal-like-btn" aria-pressed="false">
+          <span>&#9825;</span> Like
+        </button>
+
+        <!-- Open on YouTube -->
+        <a id="short-modal-yt" href="#" target="_blank" rel="noopener noreferrer" class="short-modal-yt-link">
+          ▶ Open on YouTube
+        </a>
+
+        <!-- Prev / Next -->
+        <div class="short-modal-nav">
+          <button id="short-modal-prev" class="short-modal-nav-btn" aria-label="Previous short">&#8592; Prev</button>
+          <button id="short-modal-next" class="short-modal-nav-btn" aria-label="Next short">Next &#8594;</button>
+        </div>
+
+        <p style="font-family:var(--font-mono);font-size:.72rem;color:var(--text-muted);margin-top:8px;">
+          &#8592; &#8594; Arrow keys · Esc to close
+        </p>
+      </div>
+
+    </div>
+  </div>
 
   <script>window.CHANNEL_ID = 'UCKQ_q75TKeAcYXYeu0uaWlQ';</script>
   <script src="js/protect.js"></script>
   <script src="js/script.js"></script>
   <script src="js/shorts.js"></script>
   <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', function() { navigator.serviceWorker.register('sw.js'); });
-    }
+    // Wire up YouTube link when modal opens
+    (function () {
+      var likeBtn = document.getElementById('short-modal-like');
+      var ytLink  = document.getElementById('short-modal-yt');
+      // shorts.js sets data-vid on the like button when opening modal — mirror it to the YT link
+      if (likeBtn && ytLink) {
+        var observer = new MutationObserver(function () {
+          var vid = likeBtn.dataset.vid;
+          if (vid) ytLink.href = 'https://www.youtube.com/shorts/' + vid;
+        });
+        observer.observe(likeBtn, { attributes: true, attributeFilter: ['data-vid'] });
+      }
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js'); });
+      }
+    })();
   </script>
 </body>
 </html>
