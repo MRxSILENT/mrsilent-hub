@@ -5,33 +5,36 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="X-Frame-Options" content="SAMEORIGIN" />
   <meta name="robots" content="noindex,nofollow,noarchive" />
-  <title>Watch — Mr. Si!ent</title>
+  <title>Watch — Mr. Si!ent Creator Hub</title>
   <link rel="stylesheet" href="css/style.css" />
   <link rel="icon" href="assets/logo.png" type="image/png" />
-  
 </head>
 <body>
+
+  <!-- ── Sidebar ───────────────────────────────────────── -->
   <nav id="sidebar" aria-label="Main navigation">
     <div class="sidebar-header">
       <img src="assets/logo.png" alt="Mr. Si!ent logo" class="sidebar-logo" />
       <span class="sidebar-title">Mr. Si!ent</span>
     </div>
     <div class="sidebar-nav">
-      <a href="index.html" class="nav-link"><span class="nav-icon">🏠</span><span class="nav-label">Home</span></a>
-      <a href="videos.html" class="nav-link"><span class="nav-icon">▶️</span><span class="nav-label">Videos</span></a>
-      <a href="live.html" class="nav-link"><span class="nav-icon">📡</span><span class="nav-label">Live</span></a>
-      <a href="shorts.html" class="nav-link"><span class="nav-icon">⚡</span><span class="nav-label">Shorts</span></a>
+      <a href="index.html"     class="nav-link"><span class="nav-icon">🏠</span><span class="nav-label">Home</span></a>
+      <a href="videos.html"    class="nav-link active" aria-current="page"><span class="nav-icon">▶️</span><span class="nav-label">Videos</span></a>
+      <a href="live.html"      class="nav-link"><span class="nav-icon">📡</span><span class="nav-label">Live</span></a>
+      <a href="shorts.html"    class="nav-link"><span class="nav-icon">⚡</span><span class="nav-label">Shorts</span></a>
       <a href="playlists.html" class="nav-link"><span class="nav-icon">📂</span><span class="nav-label">Playlists</span></a>
-      <a href="about.html" class="nav-link"><span class="nav-icon">👤</span><span class="nav-label">About</span></a>
+      <a href="about.html"     class="nav-link"><span class="nav-icon">👤</span><span class="nav-label">About</span></a>
     </div>
   </nav>
 
+  <!-- ── Mobile Topbar ─────────────────────────────────── -->
   <div id="topbar" role="banner">
     <button id="hamburger" aria-label="Open navigation" aria-expanded="false" aria-controls="nav-overlay">&#9776;</button>
     <span class="topbar-title">WATCH</span>
     <span style="width:40px"></span>
   </div>
 
+  <!-- ── Mobile Overlay ────────────────────────────────── -->
   <div id="nav-overlay" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Navigation menu">
     <div id="sidebar-mobile">
       <div class="sidebar-header" style="justify-content:space-between;">
@@ -42,43 +45,56 @@
         <button id="nav-close" aria-label="Close navigation" style="background:none;border:none;color:var(--cyan);font-size:1.4rem;cursor:pointer;padding:4px 8px;">&#x2715;</button>
       </div>
       <div class="sidebar-nav">
-      <a href="index.html" class="nav-link"><span class="nav-icon">🏠</span><span class="nav-label">Home</span></a>
-      <a href="videos.html" class="nav-link"><span class="nav-icon">▶️</span><span class="nav-label">Videos</span></a>
-      <a href="live.html" class="nav-link"><span class="nav-icon">📡</span><span class="nav-label">Live</span></a>
-      <a href="shorts.html" class="nav-link"><span class="nav-icon">⚡</span><span class="nav-label">Shorts</span></a>
-      <a href="playlists.html" class="nav-link"><span class="nav-icon">📂</span><span class="nav-label">Playlists</span></a>
-      <a href="about.html" class="nav-link"><span class="nav-icon">👤</span><span class="nav-label">About</span></a>
+        <a href="index.html"     class="nav-link"><span class="nav-icon">🏠</span><span class="nav-label">Home</span></a>
+        <a href="videos.html"    class="nav-link active"><span class="nav-icon">▶️</span><span class="nav-label">Videos</span></a>
+        <a href="live.html"      class="nav-link"><span class="nav-icon">📡</span><span class="nav-label">Live</span></a>
+        <a href="shorts.html"    class="nav-link"><span class="nav-icon">⚡</span><span class="nav-label">Shorts</span></a>
+        <a href="playlists.html" class="nav-link"><span class="nav-icon">📂</span><span class="nav-label">Playlists</span></a>
+        <a href="about.html"     class="nav-link"><span class="nav-icon">👤</span><span class="nav-label">About</span></a>
       </div>
     </div>
   </div>
 
-
+  <!-- ── Main Content ──────────────────────────────────── -->
   <main id="main-content">
     <div class="watch-layout">
+
+      <!-- Player + Info -->
       <div class="watch-main">
         <div class="responsive-embed" id="watch-player">
           <div class="spinner-wrap"><div class="spinner"></div></div>
         </div>
+
         <h1 class="watch-title" id="watch-title">Loading…</h1>
-        <div class="watch-meta" id="watch-meta"></div>
-        <a href="videos.html" style="display:inline-flex;align-items:center;gap:6px;color:var(--text-secondary);text-decoration:none;font-size:.9rem;margin-top:8px;transition:color .2s" onmouseover="this.style.color='var(--cyan)'" onmouseout="this.style.color='var(--text-secondary)'">&#8592; Back to Videos</a>
+        <div class="watch-meta"  id="watch-meta"></div>
+
+        <!-- ❤️ 👁️ 💬 stat pills -->
+        <div class="watch-stats" id="watch-stats"></div>
+
+        <a href="videos.html"
+           style="display:inline-flex;align-items:center;gap:6px;color:var(--text-secondary);text-decoration:none;font-size:.9rem;margin-top:8px;transition:color .2s"
+           onmouseover="this.style.color='var(--cyan)'" onmouseout="this.style.color='var(--text-secondary)'">
+          &#8592; Back to Videos
+        </a>
       </div>
+
+      <!-- Up Next -->
       <aside aria-label="Up next">
         <div class="up-next-label">Up Next</div>
         <div id="up-next-list" class="up-next-list">
           <div class="spinner-wrap" style="padding:20px"><div class="spinner"></div></div>
         </div>
       </aside>
+
     </div>
   </main>
 
   <script>window.CHANNEL_ID = 'UCKQ_q75TKeAcYXYeu0uaWlQ';</script>
   <script src="js/protect.js"></script>
   <script src="js/script.js"></script>
-  
   <script>
     if ('serviceWorker' in navigator) {
-      window.addEventListener('load', function() { navigator.serviceWorker.register('sw.js'); });
+      window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js'); });
     }
   </script>
 </body>
