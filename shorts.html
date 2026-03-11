@@ -42,7 +42,8 @@
           <img src="assets/logo.png" alt="Mr. Si!ent logo" class="sidebar-logo" />
           <span class="sidebar-title">Mr. Si!ent</span>
         </div>
-        <button id="nav-close" aria-label="Close navigation" style="background:none;border:none;color:var(--cyan);font-size:1.4rem;cursor:pointer;padding:4px 8px;">&#x2715;</button>
+        <button id="nav-close" aria-label="Close navigation"
+          style="background:none;border:none;color:var(--cyan);font-size:1.4rem;cursor:pointer;padding:4px 8px;">&#x2715;</button>
       </div>
       <div class="sidebar-nav">
         <a href="index.html"     class="nav-link"><span class="nav-icon">🏠</span><span class="nav-label">Home</span></a>
@@ -55,95 +56,99 @@
     </div>
   </div>
 
-  <!-- ── Main Content ──────────────────────────────────── -->
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- MAIN                                                -->
+  <!-- ═══════════════════════════════════════════════════ -->
   <main id="main-content">
 
     <div class="page-header">
       <h1 class="page-title">⚡ Shorts</h1>
       <p class="page-subtitle">
-        All Shorts from Mr. Si!ent · Click any card to watch · 
+        Click any short to watch &nbsp;·&nbsp;
         <span id="shorts-count" style="color:var(--cyan);font-family:var(--font-mono);"></span>
       </p>
     </div>
 
-    <!-- Loading -->
-    <div id="shorts-loading" class="spinner-wrap" style="display:none;">
+    <!-- Loading spinner -->
+    <div id="shorts-loading" class="spinner-wrap">
       <div class="spinner"></div>
     </div>
 
-    <!-- Empty state -->
+    <!-- Empty state (hidden until needed) -->
     <div id="shorts-empty" class="empty-state" style="display:none;">
       <div class="empty-icon">⚡</div>
       No Shorts found on this channel yet.
     </div>
 
-    <!-- Shorts grid (same layout as videos) -->
-    <section id="shorts-grid" class="videos-grid" aria-label="Shorts videos">
-    </section>
+    <!-- ── Shorts grid — identical layout to videos page ─ -->
+    <section id="shorts-grid" class="videos-grid" aria-label="Shorts"></section>
 
   </main>
 
-  <!-- ══════════════════════════════════════════════════════ -->
-  <!-- Short Player Modal                                     -->
-  <!-- ══════════════════════════════════════════════════════ -->
-  <div id="short-modal" class="short-modal" role="dialog" aria-modal="true" aria-label="Short player" aria-hidden="true">
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- MODAL PLAYER                                        -->
+  <!-- ═══════════════════════════════════════════════════ -->
+  <div id="short-modal" class="short-modal" role="dialog" aria-modal="true"
+       aria-label="Short player" aria-hidden="true">
     <button id="short-modal-close" class="short-modal-close" aria-label="Close">&#x2715;</button>
 
     <div class="short-modal-inner">
 
-      <!-- 9:16 player -->
+      <!-- 9:16 video player -->
       <div id="short-modal-player" class="short-modal-player"></div>
 
       <!-- Info panel -->
       <div class="short-modal-info">
         <h2 id="short-modal-title" class="short-modal-title"></h2>
 
-        <!-- Stats row -->
         <div id="short-modal-stats" class="short-modal-stats watch-stats"></div>
 
-        <!-- Like button -->
-        <button id="short-modal-like" class="modal-like-btn" aria-pressed="false">
+        <button id="short-modal-like" class="modal-like-btn" aria-pressed="false"
+                data-vid="">
           <span>&#9825;</span> Like
         </button>
 
-        <!-- Open on YouTube -->
-        <a id="short-modal-yt" href="#" target="_blank" rel="noopener noreferrer" class="short-modal-yt-link">
+        <a id="short-modal-yt" href="#" target="_blank" rel="noopener noreferrer"
+           class="short-modal-yt-link">
           ▶ Open on YouTube
         </a>
 
-        <!-- Prev / Next -->
         <div class="short-modal-nav">
-          <button id="short-modal-prev" class="short-modal-nav-btn" aria-label="Previous short">&#8592; Prev</button>
-          <button id="short-modal-next" class="short-modal-nav-btn" aria-label="Next short">Next &#8594;</button>
+          <button id="short-modal-prev" class="short-modal-nav-btn"
+                  aria-label="Previous short">&#8592; Prev</button>
+          <button id="short-modal-next" class="short-modal-nav-btn"
+                  aria-label="Next short">Next &#8594;</button>
         </div>
 
         <p style="font-family:var(--font-mono);font-size:.72rem;color:var(--text-muted);margin-top:8px;">
-          &#8592; &#8594; Arrow keys · Esc to close
+          &#8592; &#8594; Arrow keys &nbsp;·&nbsp; Esc to close
         </p>
       </div>
-
     </div>
   </div>
 
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- SCRIPTS                                             -->
+  <!-- ═══════════════════════════════════════════════════ -->
   <script>window.CHANNEL_ID = 'UCKQ_q75TKeAcYXYeu0uaWlQ';</script>
   <script src="js/protect.js"></script>
   <script src="js/script.js"></script>
   <script src="js/shorts.js"></script>
   <script>
-    // Wire up YouTube link when modal opens
+    // Keep YouTube link in sync with currently playing short
     (function () {
       var likeBtn = document.getElementById('short-modal-like');
       var ytLink  = document.getElementById('short-modal-yt');
-      // shorts.js sets data-vid on the like button when opening modal — mirror it to the YT link
       if (likeBtn && ytLink) {
-        var observer = new MutationObserver(function () {
-          var vid = likeBtn.dataset.vid;
+        new MutationObserver(function () {
+          var vid = likeBtn.getAttribute('data-vid');
           if (vid) ytLink.href = 'https://www.youtube.com/shorts/' + vid;
-        });
-        observer.observe(likeBtn, { attributes: true, attributeFilter: ['data-vid'] });
+        }).observe(likeBtn, { attributes: true, attributeFilter: ['data-vid'] });
       }
       if ('serviceWorker' in navigator) {
-        window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js'); });
+        window.addEventListener('load', function () {
+          navigator.serviceWorker.register('sw.js');
+        });
       }
     })();
   </script>
