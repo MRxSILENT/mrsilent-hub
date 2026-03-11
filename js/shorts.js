@@ -137,6 +137,8 @@
     gridEl.innerHTML = shorts.map(function (s, i) { return buildShortCard(s, i, statsMap); }).join('');
     if (countEl) countEl.textContent = shorts.length + ' shorts';
     window._mrSilent.observeImages();
+    // Second pass for browser-cached images that fire onload before observer attaches
+    setTimeout(function () { window._mrSilent.observeImages(); }, 120);
 
     /* ── Card click → open modal ──────────────────────── */
     gridEl.addEventListener('click', function (e) {
