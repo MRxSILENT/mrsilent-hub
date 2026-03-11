@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-Frame-Options" content="SAMEORIGIN" />
+  <meta name="robots" content="noindex,nofollow,noarchive" />
+  <title>Shorts — Mr. Si!ent</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" href="assets/logo.png" type="image/png" />
+  <style>
+    body { overflow: hidden; }
+    #main-content { display:flex; flex-direction:column; height:100vh; overflow:hidden; }
+    @media (max-width:600px) {
+      body { overflow: auto; }
+      #main-content { height:auto; overflow:visible; }
+      .shorts-list { width:100%;border-right:none;border-bottom:1px solid var(--border);flex-direction:row;overflow-x:auto;overflow-y:hidden;max-height:160px;padding:10px 12px;gap:10px; }
+      .short-item { width:90px;flex-shrink:0;max-height:none;aspect-ratio:9/16;height:140px; }
+      .shorts-viewer { min-height:60vh;flex:1; }
+    }
+  </style>
+</head>
+<body>
+  <nav id="sidebar" aria-label="Main navigation">
+    <div class="sidebar-header">
+      <img src="assets/logo.png" alt="Mr. Si!ent logo" class="sidebar-logo" />
+      <span class="sidebar-title">Mr. Si!ent</span>
+    </div>
+    <div class="sidebar-nav">
+      <a href="index.html" class="nav-link"><span class="nav-icon">🏠</span><span class="nav-label">Home</span></a>
+      <a href="videos.html" class="nav-link"><span class="nav-icon">▶️</span><span class="nav-label">Videos</span></a>
+      <a href="live.html" class="nav-link"><span class="nav-icon">📡</span><span class="nav-label">Live</span></a>
+      <a href="shorts.html" class="nav-link active" aria-current="page"><span class="nav-icon">⚡</span><span class="nav-label">Shorts</span></a>
+      <a href="playlists.html" class="nav-link"><span class="nav-icon">📂</span><span class="nav-label">Playlists</span></a>
+      <a href="about.html" class="nav-link"><span class="nav-icon">👤</span><span class="nav-label">About</span></a>
+    </div>
+  </nav>
+
+  <div id="topbar" role="banner">
+    <button id="hamburger" aria-label="Open navigation" aria-expanded="false" aria-controls="nav-overlay">&#9776;</button>
+    <span class="topbar-title">SHORTS</span>
+    <span style="width:40px"></span>
+  </div>
+
+  <div id="nav-overlay" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Navigation menu">
+    <div id="sidebar-mobile">
+      <div class="sidebar-header" style="justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <img src="assets/logo.png" alt="Mr. Si!ent logo" class="sidebar-logo" />
+          <span class="sidebar-title">Mr. Si!ent</span>
+        </div>
+        <button id="nav-close" aria-label="Close navigation" style="background:none;border:none;color:var(--cyan);font-size:1.4rem;cursor:pointer;padding:4px 8px;">&#x2715;</button>
+      </div>
+      <div class="sidebar-nav">
+      <a href="index.html" class="nav-link"><span class="nav-icon">🏠</span><span class="nav-label">Home</span></a>
+      <a href="videos.html" class="nav-link"><span class="nav-icon">▶️</span><span class="nav-label">Videos</span></a>
+      <a href="live.html" class="nav-link"><span class="nav-icon">📡</span><span class="nav-label">Live</span></a>
+      <a href="shorts.html" class="nav-link active" aria-current="page"><span class="nav-icon">⚡</span><span class="nav-label">Shorts</span></a>
+      <a href="playlists.html" class="nav-link"><span class="nav-icon">📂</span><span class="nav-label">Playlists</span></a>
+      <a href="about.html" class="nav-link"><span class="nav-icon">👤</span><span class="nav-label">About</span></a>
+      </div>
+    </div>
+  </div>
+
+
+  <main id="main-content">
+    <div class="shorts-header" style="padding:18px 24px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;flex-shrink:0;">
+      <h1 class="page-title" style="font-size:1rem;">&#9889; Shorts</h1>
+      <span style="color:var(--text-muted);font-size:.85rem;font-family:var(--font-mono);">&#8593; &#8595; Arrow keys to navigate</span>
+      <span id="shorts-count" style="margin-left:auto;font-family:var(--font-mono);font-size:.8rem;color:var(--text-muted);"></span>
+    </div>
+    <div style="display:flex;flex:1;overflow:hidden;">
+      <div id="shorts-list" class="shorts-list" aria-label="Shorts list"></div>
+      <div id="shorts-viewer" class="shorts-viewer">
+        <div id="shorts-loading" class="spinner-wrap" style="position:absolute;"><div class="spinner"></div></div>
+        <div id="shorts-empty" class="shorts-empty" style="display:none;" aria-live="polite">
+          <div class="empty-icon">&#9889;</div>No Shorts found on this channel yet.
+        </div>
+        <div id="shorts-player" class="shorts-player" aria-label="Shorts player"></div>
+      </div>
+    </div>
+  </main>
+
+  <script>window.CHANNEL_ID = 'UCKQ_q75TKeAcYXYeu0uaWlQ';</script>
+  <script src="js/protect.js"></script>
+  <script src="js/script.js"></script>
+  <script src="js/shorts.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() { navigator.serviceWorker.register('sw.js'); });
+    }
+  </script>
+</body>
+</html>
