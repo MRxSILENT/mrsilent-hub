@@ -166,7 +166,9 @@ body::after {
 .trending-stats span { display: flex; align-items: center; gap: 3px; }
 
 /* ── Shorts grid ─────────────────────────── */
-.short-card .thumb-wrap { aspect-ratio: 9/16 !important; }
+.short-card { cursor: pointer; }
+.short-card .thumb-wrap,
+.short-thumb-wrap { aspect-ratio: 9/16 !important; }
 .short-badge { position: absolute; top: 8px; right: 8px; background: rgba(0,220,255,.9); color: var(--bg-void); font-family: var(--font-display); font-size: .52rem; font-weight: 700; letter-spacing: .1em; padding: 3px 8px; border-radius: 4px; z-index: 2; box-shadow: 0 0 8px var(--cyan); }
 
 /* ── Short Like Button (on card) ─────────── */
@@ -218,7 +220,55 @@ body::after {
 .live-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,50,50,.15); border: 1px solid rgba(255,50,50,.4); color: #ff4444; font-family: var(--font-display); font-size: .6rem; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; padding: 6px 14px; border-radius: 100px; margin-bottom: 16px; }
 .live-dot { width: 7px; height: 7px; border-radius: 50%; background: #ff4444; box-shadow: 0 0 6px #ff4444; animation: blink .9s step-end infinite; }
 
-/* ── Short Player Modal ──────────────────── */
+/* ── Duration badge on thumb ─────────────── */
+.dur-badge {
+  position: absolute; bottom: 6px; right: 8px;
+  background: rgba(2,5,16,.85);
+  color: var(--text-primary);
+  font-family: var(--font-mono); font-size: .72rem;
+  padding: 2px 7px; border-radius: 4px;
+  z-index: 2; letter-spacing: .03em;
+}
+.live-thumb-badge {
+  position: absolute; top: 8px; left: 8px;
+  background: rgba(255,50,50,.9);
+  color: #fff;
+  font-family: var(--font-display); font-size: .52rem; font-weight: 700;
+  letter-spacing: .12em; padding: 3px 8px; border-radius: 4px;
+  z-index: 2; display: flex; align-items: center; gap: 5px;
+}
+.past-live-badge {
+  position: absolute; top: 8px; left: 8px;
+  background: rgba(0,102,255,.85);
+  color: #fff;
+  font-family: var(--font-display); font-size: .5rem; font-weight: 700;
+  letter-spacing: .1em; padding: 3px 8px; border-radius: 4px; z-index: 2;
+}
+
+/* ── Live page offline card ──────────────── */
+.live-offline-card {
+  max-width: 480px;
+  padding: 40px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 1rem;
+  line-height: 1.7;
+}
+.live-badge-offline { background: rgba(100,100,120,.15); border-color: rgba(100,100,120,.35); color: var(--text-secondary); }
+.offline-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--text-muted); margin-right: 2px; }
+.sub-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  margin-top: 20px; padding: 12px 24px;
+  background: var(--cyan-faint); border: 1px solid var(--border-bright);
+  border-radius: 100px; color: var(--cyan);
+  text-decoration: none; font-family: var(--font-display);
+  font-size: .65rem; font-weight: 700; letter-spacing: .12em;
+  text-transform: uppercase; transition: all var(--trans);
+}
+.sub-btn:hover { background: var(--cyan); color: var(--bg-void); box-shadow: 0 0 20px var(--cyan-glow); }
 .short-modal {
   display: none;
   position: fixed; inset: 0; z-index: 500;
