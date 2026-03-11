@@ -137,22 +137,46 @@
     return iso ? new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
   }
 
-  /* ── Lazy images ───────────────────────────────────────── */
+  /* ── Lazy images (opacity fade, no blur glitch) ────────── */
   function observeImages() {
+    // For images already cached/complete, mark them immediately
+    document.querySelectorAll('img[data-src], img[src]').forEach(function (img) {
+      if (img.complete && img.naturalWidth > 0) img.classList.add('loaded');
+    });
+
     if (!('IntersectionObserver' in window)) {
-      document.querySelectorAll('img[data-src]').forEach(function (img) { img.src = img.dataset.src; img.classList.add('loaded'); });
+      document.querySelectorAll('img[data-src]').forEach(function (img) {
+        img.src = img.dataset.src || img.src;
+        if (img.complete && img.naturalWidth > 0) img.classList.add('loaded');
+        else img.onload = function () { img.classList.add('loaded'); };
+      });
       return;
     }
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
         if (!entry.isIntersecting) return;
-        var img = entry.target, hq = img.dataset.hq;
-        if (hq) { var l = new Image(); l.onload = function () { img.src = hq; img.classList.add('loaded'); }; l.src = hq; }
-        else { img.src = img.dataset.src; img.onload = function () { img.classList.add('loaded'); }; }
+        var img = entry.target;
+        var hq  = img.dataset.hq;
+        var src = img.dataset.src || img.getAttribute('src');
+        function markLoaded() { img.classList.add('loaded'); }
+        if (hq) {
+          // load HQ, fall back to MQ if HQ 404s
+          var loader = new Image();
+          loader.onload  = function () { img.src = hq; markLoaded(); };
+          loader.onerror = function () { img.src = src; markLoaded(); };
+          loader.src = hq;
+        } else if (src) {
+          if (img.complete && img.naturalWidth > 0) { markLoaded(); }
+          else { img.src = src; img.onload = markLoaded; img.onerror = markLoaded; }
+        }
         io.unobserve(img);
       });
-    }, { rootMargin: '200px' });
-    document.querySelectorAll('img[data-src]').forEach(function (img) { io.observe(img); });
+    }, { rootMargin: '300px' });
+
+    document.querySelectorAll('img[data-src], .thumb-wrap img:not(.loaded)').forEach(function (img) {
+      if (img.complete && img.naturalWidth > 0) { img.classList.add('loaded'); }
+      else { io.observe(img); }
+    });
   }
 
   /* ── Build Video Card with stats ───────────────────────── */
@@ -247,8 +271,8 @@
       var items = data.items || [];
       var ids = items.map(function (v) { return (v.id && v.id.videoId) || ''; }).filter(Boolean);
       // render skeleton stats first
-      if (grid) { grid.innerHTML = items.map(function (i) { return buildVideoCard(i, null); }).join(''); observeImages(); }
-      if (trending) { trending.innerHTML = items.slice(0, 3).map(function (v, i) { return buildTrendingCard(v, i, null); }).join(''); observeImages(); }
+      if (grid) { grid.innerHTML = items.map(function (i) { return buildVideoCard(i, null); }).join(''); observeImages(); setTimeout(observeImages, 120); }
+      if (trending) { trending.innerHTML = items.slice(0, 3).map(function (v, i) { return buildTrendingCard(v, i, null); }).join(''); observeImages(); setTimeout(observeImages, 120); }
       initHomeSearch(items, grid, null);
       // then fetch real stats and re-render
       fetchVideoStats(ids).then(function (stats) {
